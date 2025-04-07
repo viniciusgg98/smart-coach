@@ -1,0 +1,25 @@
+# .github/workflows/deploy.yml
+
+name: Deploy
+
+on:
+  push:
+    tags:
+      - 'v*'  # Dispara o deploy ao criar uma tag tipo v1.0
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Clona o repositório
+      uses: actions/checkout@v3
+
+    - name: Faz login no Docker Hub
+      run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+    - name: Build da imagem
+      run: docker build -t ${{ secrets.DOCKER_USERNAME }}/avaliacao-app:${{ github.ref_name }} .
+
+    - name: Push da imagem para Docker Hub
+      run: docker push ${{ secrets.DOCKER_USERNAME }}/avaliacao-app:${{ github.ref_name }}

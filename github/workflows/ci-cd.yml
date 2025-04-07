@@ -1,0 +1,30 @@
+# .github/workflows/ci-cd.yml
+
+name: CI/CD
+
+on:
+  push:
+    branches: [ "main" ]  # Executa quando fizer push na branch main
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Clona o repositório
+      uses: actions/checkout@v3
+
+    - name: Configura o Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    - name: Build da imagem Docker
+      run: docker build -t avaliacao-app .
+
+    - name: Testa execução do script
+      run: docker run -i avaliacao-app python avaliacao.py < test_input.txt
+      # test_input.txt pode conter entradas simuladas se quiser automatizar
+
